@@ -2,6 +2,9 @@
 - Pre-moderated mark: 70/70 (A*)
 - Post-moderated mark: 70/70 (A*)
 - The score break down can be seen in project-marksheet.docx
+
+[![image](https://github.com/user-attachments/assets/89b13e93-bdae-4a40-b481-cac1cb598159)](https://www.ocr.org.uk/Images/714687-as-and-a-level-grade-boundaries-june-2024.pdf#page=2)
+
 ## 📁 Documentation
 - The project documentation can be seen in project-documentation.docx, which includes:
     - Analysis
