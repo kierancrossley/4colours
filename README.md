@@ -14,3 +14,11 @@
 - Each client can connect to the server using the IP and port
 - There is a max of 4 players per server
 - If the server is hosted on the same computer as a client, the client can use localhost:7777 to connect
+## 🤝 Credits & Attributions 
+- [Background.png](https://imgur.com/gallery/high-res-steven-universe-backgrounds-pt-2-mSoGv)
+- [Background2.png](https://wall.alphacoders.com/big.php?i=1125764)
+- [Background3.jpeg](https://wallpapers.com/background/steven-universe-background-ngbfykufcx4idrcc.html)
+- [CD.png](https://www.flaticon.com/free-icons/repeat)
+- [MT.png](https://www.flaticon.com/free-icons/no-entry)
+- [P2.png](https://www.shareicon.net/faults-couple-sports-red-two-card-play-football-cards-pair-yellow-681675)
+- [RightArrow.png](https://www.flaticon.com/free-icons/next)
