@@ -1,4 +1,6 @@
+using UnityEngine;
 using UnityEngine.Events;
+using System.Collections.Generic;
 using Riptide;
 
 public static class EventController
@@ -9,6 +11,6 @@ public static class EventController
     public static event UnityAction<Message, ushort> SendMessageToPlayer; // send message to specific player
     public static void Send(Message msg, ushort id) => SendMessageToPlayer?.Invoke(msg, id);
 
-    public static event UnityAction StopServer; // stop the server
-    public static void Stop() => StopServer?.Invoke();
+    public static event UnityAction StopServer; // send on stopping server
+    public static void OnStopServer() => StopServer?.Invoke();
 }

@@ -6,7 +6,7 @@ public class ColourSelectUI : MonoBehaviour
     [SerializeField] private GameObject colourSelect;
     private static GameObject _colourSelect;
 
-    void Awake()
+    private void Awake()
     {
         _colourSelect = colourSelect; // same again, no instance=instance in initialization
         colourSelect.SetActive(false); 

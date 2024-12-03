@@ -11,6 +11,11 @@ public class CardPlayedUI : MonoBehaviour
         _cardPlayed = cardPlayed; // can't set instance to instance in initialization 
         _cardPlayed.SetActive(false); // set invisible as no cards played yet 
     }
+
+    public static void HideCard()
+    {
+        _cardPlayed.SetActive(false);
+    }
     
     public static void UpdateCard(int cardId) // saves running update each frame call (update method)
     {

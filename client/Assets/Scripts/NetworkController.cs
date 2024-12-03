@@ -68,6 +68,7 @@ public class NetworkController : MonoBehaviour
         client.ConnectionFailed += ConnectionHandler;
         EventController.ConnectRequest += Connect;
         EventController.SendMessage += OnSendMessage;
+        EventController.LeaveGame += Disconnect;
     }
 
     private void Unsubscribe()
@@ -77,6 +78,7 @@ public class NetworkController : MonoBehaviour
         client.ConnectionFailed -= ConnectionHandler;
         EventController.ConnectRequest -= Connect;
         EventController.SendMessage -= OnSendMessage;
+        EventController.LeaveGame -= Disconnect;
     }
 
     private void ConnectionHandler(object sender, ConnectionFailedEventArgs e)
@@ -102,11 +104,24 @@ public class NetworkController : MonoBehaviour
         errorText.text = msg;
     }
 
-    public void Connect(string username)
+    public void Connect(string username, string host)
     {
-        localUsername = string.IsNullOrEmpty(username) ? $"Guest" : username;
-        client.Connect("127.0.0.1:7777");
+        if(ipRegex.IsMatch(host)) // riptide requires connection in ip:port format 
+        {
+            errorText.text = "Attempting connection...";
+            localUsername = string.IsNullOrEmpty(username) ? $"Guest" : username;
+            client.Connect(host);
+        }
+        else
+        {
+            errorText.text = "Invalid host address"; 
+        }
     }
+
+    private void Disconnect()
+     {
+        client.Disconnect();
+     }
 
     private void OnSendMessage(Message msg)
     {

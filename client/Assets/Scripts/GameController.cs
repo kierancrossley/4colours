@@ -3,6 +3,7 @@ using System.Linq;
 using UnityEngine;
 using TMPro;
 using Riptide;
+using UnityEngine.SceneManagement;
 
 public class GameController : MonoBehaviour
 {
@@ -113,6 +114,7 @@ public class GameController : MonoBehaviour
 
     private static void AddCard(ushort id, bool hidden, int cardId = -1)
     {
+        Debug.Log("Adding card");
         int handId = PlayerController.GetHand(id);
         GameObject[] parentHand = GameObject.FindGameObjectsWithTag("Hand"); // find the hand with id
        
@@ -120,6 +122,17 @@ public class GameController : MonoBehaviour
         CardUI card = Instantiate(_cardPrefab, Vector3.zero, Quaternion.identity, parentHand[handId - 1].transform).GetComponent<CardUI>();
         card.name = $"{id} {cardId}"; // playerid and cardid for identifying 
         card.Init(hidden, cardId); // use constructor method to set attributes 
+    }
+
+    public void MenuReturn()
+    {
+        EventController.OnLeaveGame();
+    }  
+
+    public void RejoinGame()
+    {
+        _winScreen.SetActive(false);
+        EventController.OnRejoinGame();
     }
 
     // Messages

@@ -4,6 +4,7 @@ using UnityEngine;
 public class HandUI : MonoBehaviour
 {
     [SerializeField] private TMP_Text usernameText;
+    [SerializeField] private GameObject layout;
     private ushort id;
 
     private void Awake()
@@ -14,11 +15,13 @@ public class HandUI : MonoBehaviour
     private void Subscribe()
     {
         EventController.TurnChange += SetUsernameColour; // using events saves checking in an update method 
+        EventController.RejoinGame += ResetCards;
     }
 
     private void Unsubscribe()
     {
         EventController.TurnChange -= SetUsernameColour;
+        EventController.RejoinGame -= ResetCards;
     }
 
     private void OnDestroy()
@@ -37,10 +40,24 @@ public class HandUI : MonoBehaviour
         }
             
     }
+
+    private void ResetCards()
+    {
+        foreach (Transform child in layout.transform) 
+        {
+            Destroy(child.gameObject); // destroy all cards
+        }
+    }
     
     public void UpdateUsername(ushort Id)
     {
         id = Id; // cache id for setusernamecolour
+
+        if (PlayerController.GetPlayer(Id) == null)
+        {
+            return;
+        }
+
         usernameText.SetText(PlayerController.GetPlayer(Id).username); // set hand username 
     }
 }

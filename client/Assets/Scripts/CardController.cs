@@ -32,6 +32,29 @@ public class CardController : MonoBehaviour
         MTSprite = Resources.Load<Sprite>("MT");
         CDSprite = Resources.Load<Sprite>("CD");
         P2Sprite = Resources.Load<Sprite>("P2");
+
+        Subscribe();
+    }
+
+    private void Subscribe()
+    {
+        EventController.RejoinGame += ResetCard;
+    }
+
+    private void Unsubscribe()
+    {
+        EventController.RejoinGame -= ResetCard;
+    }
+
+    private void OnDestroy()
+    {
+        Unsubscribe();
+    }
+
+    private void ResetCard()
+    {
+        cardIdPlayed = -1;
+        CardPlayedUI.HideCard();
     }
 
     private void ColourSet(string colour)

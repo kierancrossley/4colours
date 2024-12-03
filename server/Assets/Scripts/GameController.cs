@@ -1,15 +1,25 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.UI;
 using Riptide;
+using Riptide.Utils;
 
 public class GameController : MonoBehaviour
 {
-    public static ushort turnId = 0; 
+    public static ushort turnId = 0;
     public static int playDirection = 1;
     public static bool missTurn = false;
     public static int cardDebt = 0;
     public static bool gameStarted = false;
+
+    [SerializeField] private Button beginButton;
+    private static Button _beginButton;
+
+    private void Awake()
+    {
+        _beginButton = beginButton;
+    }
 
     private void Start()
     {
@@ -20,39 +30,55 @@ public class GameController : MonoBehaviour
     {
         Dictionary<ushort, Player> players = PlayerController.GetAllPlayers(); // access the static attribute via a method
 
-        if(players.Count > 1) // can't play with 1 player 
+        if (players.Count > 1) // can't play with 1 player 
         {
             bool allReady = true; // flag variable 
-            foreach(KeyValuePair<ushort, Player> ply in players)
+            foreach (KeyValuePair<ushort, Player> ply in players)
             {
-                if(ply.Value.ready == false)
-                { 
+                if (ply.Value.ready == false)
+                {
                     allReady = false; // flag that a player is not ready
                     return; // so no point continuing anything (had a break here originally) 
                 }
             }
-            if(allReady)
+            if (allReady)
             {
-                gameStarted = true;
-
-                Message msg = Message.Create(MessageSendMode.Reliable, ServerToClient.SendGameBegun);
-                EventController.Send(msg);
-
-                CancelInvoke("CheckReadyStatus"); // cancel the ready status check as game has started 
-
-                foreach(KeyValuePair<ushort, Player> ply in players)
-                {
-                    for(int count = 0; count <= 6; count++) // give starting 7 cards to each player
-                    {
-                        CardController.AddCard(ply.Key);
-                    }
-                }
-
-                // had in next turn originally, checking if turnid==0 in if statement etc. (checking every call)
-                turnId = (ushort)players.Keys.Min(); // client 1 may leave, player key now starts at 2 etc.
-                SendNextTurn();
+                BeginGame(false);
             }
         }
+    }
+
+    public void BeginGame(bool forced)
+    {
+        Dictionary<ushort, Player> players = PlayerController.GetAllPlayers(); // access the static attribute via a method
+
+        if ((forced) && (players.Count < 2))
+        {
+            RiptideLogger.Log(Riptide.Utils.LogType.Warning, "Game", "Not enough players to begin game!");
+            return;
+        }
+
+        gameStarted = true;
+        beginButton.interactable = false;
+
+        RiptideLogger.Log(Riptide.Utils.LogType.Info, "Game", $"Match has successfully started.");
+
+        Message msg = Message.Create(MessageSendMode.Reliable, ServerToClient.SendGameBegun);
+        EventController.Send(msg);
+
+        CancelInvoke("CheckReadyStatus"); // cancel the ready status check as game has started 
+
+        foreach (KeyValuePair<ushort, Player> ply in players)
+        {
+            for (int count = 0; count <= 6; count++) // give starting 7 cards to each player
+            {
+                CardController.AddCard(ply.Key);
+            }
+        }
+
+        // had in next turn originally, checking if turnid==0 in if statement etc. (checking every call)
+        turnId = (ushort)players.Keys.Min(); // client 1 may leave, player key now starts at 2 etc.
+        SendNextTurn();
     }
 
     private static void SendNextTurn()
@@ -124,7 +150,30 @@ public class GameController : MonoBehaviour
             msg.AddUShort(id);
         EventController.Send(msg);
 
-        //EventController.Stop(); // you would restart server here 
+        playDirection = 1; // resetting game attributes
+        missTurn = false;
+        cardDebt = 0;
+        gameStarted = false;
+
+        CardController.cardIdPlayed = -1; // resetting card attributes
+        CardController.pickupDeck.AddRange(CardController.playedDeck);
+        CardController.playedDeck.Clear();
+
+        Dictionary<ushort, Player> players = PlayerController.GetAllPlayers(); // access the static attribute via a method
+        foreach(KeyValuePair<ushort, Player> ply in players)
+        {
+            foreach(int card in ply.Value.cards){
+                CardController.pickupDeck.Add(card);
+            }
+            ply.Value.cards.Clear();
+        }
+
+        CardController.ShuffleList(CardController.pickupDeck);
+
+        _beginButton.interactable = true;
+
+        GameController gameControllerInstance = FindObjectOfType<GameController>();
+        gameControllerInstance.InvokeRepeating("CheckReadyStatus", 1.0f, 5.0f); // restart the check
     }
 
     // Messages
@@ -227,7 +276,7 @@ public class GameController : MonoBehaviour
     [MessageHandler((ushort)ClientToServer.RequestCardPickup)] // request to pickup card netmessage from client 
     private static void ReceiveCardPickup(ushort id, Message msg)
     {
-        if(turnId == id) // check its their turn to pickup a card 
+        if((turnId == id) && (gameStarted)) // check its their turn to pickup a card 
         {
             CardController.AddCard(id); // give them a card
             NextTurn(); // don't let them play a card 

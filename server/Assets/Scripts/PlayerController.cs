@@ -1,16 +1,20 @@
 using System.Collections.Generic;
 using UnityEngine;
 using Riptide;
+using Riptide.Utils;
 
 public class PlayerController : MonoBehaviour // inherits MonoBehaviour
 {
     [SerializeField] private GameObject playerPrefab; 
+    [SerializeField] private Transform playerList; 
     private static GameObject staticPlayerPrefab; // only statics can access statics :(
+    private static Transform staticPlayerList; 
     [SerializeField] private static Dictionary<ushort, Player> players = new Dictionary<ushort, Player>();
 
     private void Awake()
     {
         staticPlayerPrefab = playerPrefab; // cannot set an instance variables to eachother in initialization 
+        staticPlayerList = playerList;
     }
 
     public static Player GetPlayer(ushort id)  // check if player exists in players
@@ -28,6 +32,7 @@ public class PlayerController : MonoBehaviour // inherits MonoBehaviour
     {
         if (players.TryGetValue(id, out Player result))
         {
+            NetworkController.server.DisconnectClient(id);
             players.Remove(id);
 
             Message msg = Message.Create(MessageSendMode.Reliable, ServerToClient.SendDisconnectedPlayer);
@@ -36,11 +41,11 @@ public class PlayerController : MonoBehaviour // inherits MonoBehaviour
         }
     } 
 
-    private static void AddPlayer(ushort id, string username)
+    private static void AddPlayer(ushort id, string username, string ip)
     {
-        Player player = Instantiate(staticPlayerPrefab, Vector3.zero, Quaternion.identity).GetComponent<Player>(); // create game object
+        Player player = Instantiate(staticPlayerPrefab, Vector3.zero, Quaternion.identity, staticPlayerList).GetComponent<Player>(); // create game object
         player.name = $"{id}"; // set display name of game object
-        player.Init(id, username);
+        player.Init(id, username, ip);
         players.Add(id, player);
     }
 
@@ -132,10 +137,16 @@ public class PlayerController : MonoBehaviour // inherits MonoBehaviour
     private static void InitializeNewPlayer(ushort id, Message msg)
     {
         string username = msg.GetString();
+        string ip = "Unknown";
+
+        if(NetworkController.server.TryGetClient(id, out Connection client)){
+            ip = client.ToString();
+        }
 
         SendConnectedPlayers(id); // send connected players if any 
         SendNewPlayer(id, username); // send new player to connected players if any 
 
-        AddPlayer(id, username); // add the player on the server 
+        AddPlayer(id, username, ip); // add the player on the server 
+        RiptideLogger.Log(Riptide.Utils.LogType.Info, "Player", $"Initialised client {id} as: {username}");
     }
 }

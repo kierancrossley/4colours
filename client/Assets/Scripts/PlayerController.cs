@@ -44,7 +44,10 @@ public class PlayerController : MonoBehaviour
     }
 
     public static void SetHand(ushort id, int hand){
-        players[id].handId = hand;
+        if (players.ContainsKey(id))
+        {
+            players[id].handId = hand;
+        }
     }
 
     public static int GetHand(ushort id){

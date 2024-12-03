@@ -32,7 +32,7 @@ public class CardController : MonoBehaviour
         ShuffleList(pickupDeck); // cannot have in awake, shuffles before cards added to pickup
     }
 
-    private static void ShuffleList<T>(List<T> list) // Fisher-Yates algorithm
+    public static void ShuffleList<T>(List<T> list) // Fisher-Yates algorithm
     {
         System.Random rng = new System.Random(); // differentiate from unity random
 
