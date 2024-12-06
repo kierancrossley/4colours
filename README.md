@@ -14,9 +14,12 @@
 ## 💭 How does it work?
 - Start the server on the computer that will host the game
 - Port 7777 must be free and port-forwarded to allow clients to connect
-- Each client can connect to the server using the IP and port
+- Clients must be on the same computer as the server, unless they edit the Network Controller IP
 - There is a max of 4 players per server
-- If the server is hosted on the same computer as a client, the client can use localhost:7777 to connect
+- You can preview how the game works [here](https://www.youtube.com/watch?v=eSeOdIulhpY)
+## 🚧 Issues & Improvements
+- It is hard for clients to connect on external computers as they have to edit the IP in unity and then build their own client 
+- The server is just a blank screen, and offers no control, configeration or information about itself 
 ## 🤝 Credits & Attributions 
 - [Background.png](https://imgur.com/gallery/high-res-steven-universe-backgrounds-pt-2-mSoGv)
 - [Background2.png](https://wall.alphacoders.com/big.php?i=1125764)
